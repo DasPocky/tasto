@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tasto",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "account_id": "ef9cbceacd8be6cff839033e54c0cb6b",
+  // Läuft unter endlab.de/tasto – die Route greift vor dem Worker auf der Hauptdomain
+  "routes": [{ "pattern": "endlab.de/tasto*", "zone_name": "endlab.de" }],
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Alle Anfragen zuerst an den Worker: API + SPA-Fallback unter /tasto
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tasto",
+      "database_id": "22c8a94f-b886-42a4-8511-0e0b808f3a6a",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

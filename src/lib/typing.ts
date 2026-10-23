@@ -102,6 +102,24 @@ export function computeStats(s: TypingState, now: number = s.lastAt ?? 0): Typin
   return { elapsedMs, correctChars, cpm, wpm, accuracy, score: Math.round(wpm * 100) }
 }
 
+/** Spielt ein Tastenprotokoll erneut ab – so rechnet der Server Ergebnisse selbst nach. */
+export function replay(text: string, mode: ErrorCorrection, events: KeyEvent[]): TypingState {
+  let s = createTypingState(text, mode)
+  let now = 0
+  for (const [key, code, ms] of events) {
+    now += ms
+    s = pressKey(s, key, code, now)
+  }
+  return s
+}
+
+/** Anzahl Fehler, die anschließend korrigiert wurden („Fehler verbessert“). */
+export function countFixed(s: TypingState): number {
+  let fixed = 0
+  for (const i of s.errors) if (i < s.pos && s.input[i] === s.text[i]) fixed++
+  return fixed
+}
+
 export interface UnitSample {
   hits: number
   misses: number

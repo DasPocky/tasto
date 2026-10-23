@@ -21,7 +21,7 @@ export function Keyboard({ nextChar, pressedCode, enabledChars, className }: Pro
 
   return (
     <div className={cn('mx-auto w-full max-w-3xl select-none', className)}>
-      <div className="flex flex-col gap-1 rounded-xl bg-neutral-100 p-2">
+      <div className="flex flex-col gap-1 rounded-xl bg-muted p-2">
         {KEYBOARD_DE.map((row, r) => (
           <div key={r} className="flex gap-1">
             {row.map((key) => {
@@ -36,7 +36,7 @@ export function Keyboard({ nextChar, pressedCode, enabledChars, className }: Pro
                     'relative flex h-10 items-center justify-center rounded-md border border-black/10 text-sm text-neutral-700 transition-[transform,box-shadow] duration-75 sm:h-11',
                     !color && 'bg-white',
                     disabled && 'text-neutral-300',
-                    isTarget && 'z-10 ring-2 ring-neutral-800',
+                    isTarget && 'z-10 ring-2 ring-foreground',
                     pressedCode === key.code && 'translate-y-px shadow-inner',
                   )}
                   style={{ flex: `${key.width ?? 1} 1 0`, backgroundColor: color }}
@@ -50,7 +50,7 @@ export function Keyboard({ nextChar, pressedCode, enabledChars, className }: Pro
         ))}
       </div>
       {target?.key.finger !== undefined && (
-        <p className="mt-2 text-center text-sm text-neutral-500">
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           {nextChar === ' ' ? 'Leertaste' : <kbd className="font-mono">{nextChar}</kbd>} mit dem{' '}
           {FINGER_NAMES[target.key.finger]}
           {target.shift && ' + Umschalttaste'}

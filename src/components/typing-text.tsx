@@ -41,8 +41,8 @@ export function TypingText({ state, lines = 3, className }: Props) {
             ref={current ? cursorRef : undefined}
             className={cn(
               'relative rounded-sm',
-              !typed && 'text-neutral-400',
-              typed && !wrong && 'text-neutral-800',
+              !typed && 'text-muted-foreground',
+              typed && !wrong && 'text-foreground',
               fixed && 'bg-yellow-200/70',
               wrong && 'bg-red-100 text-red-500',
               current && 'bg-emerald-100 text-neutral-900',
