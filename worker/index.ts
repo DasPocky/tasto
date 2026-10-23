@@ -10,12 +10,12 @@ import type {
 } from '../src/lib/api-types'
 import { computeStats, countFixed, replay, type KeyEvent } from '../src/lib/typing'
 import { PseudoWordGenerator, createRng } from '../src/lib/words'
+import { ASSETS, type EmbeddedAsset } from './assets.gen'
 
 const BASE_PATH = '/tasto'
 
 interface Env {
   DB: D1Database
-  ASSETS: Fetcher
 }
 
 const TEST_PERIOD = 60
@@ -109,15 +109,39 @@ export default {
     const url = new URL(request.url)
     if (url.pathname.startsWith(`${BASE_PATH}/api/`)) return api.fetch(request, env, ctx)
     if (url.pathname === BASE_PATH) return Response.redirect(`${url.origin}${BASE_PATH}/`, 301)
+    if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method Not Allowed', { status: 405 })
 
     // Statische Dateien; unbekannte Seiten-Pfade bekommen die App (Client-Routing)
-    const res = await env.ASSETS.fetch(request)
-    if (res.status === 404 && request.method === 'GET' && request.headers.get('accept')?.includes('text/html')) {
-      return env.ASSETS.fetch(new Request(new URL(`${BASE_PATH}/`, url), request))
-    }
-    return res
+    const path = url.pathname.slice(BASE_PATH.length)
+    const asset = ASSETS[path === '/' ? '/index.html' : path]
+    if (asset) return serveAsset(asset)
+    if (path.startsWith('/assets/') || extensionOf(path)) return new Response('Not Found', { status: 404 })
+    return serveAsset(ASSETS['/index.html'])
   },
 } satisfies ExportedHandler<Env>
+
+// --- Statische Dateien ---
+
+const decoded = new Map<EmbeddedAsset, Uint8Array>()
+
+function serveAsset(asset: EmbeddedAsset): Response {
+  let body = decoded.get(asset)
+  if (!body) {
+    body = Uint8Array.from(atob(asset.body), (c) => c.charCodeAt(0))
+    decoded.set(asset, body)
+  }
+  return new Response(body, {
+    headers: {
+      'content-type': asset.type,
+      'cache-control': asset.immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
+    },
+  })
+}
+
+function extensionOf(path: string): string {
+  const name = path.slice(path.lastIndexOf('/') + 1)
+  return name.includes('.') ? name.slice(name.lastIndexOf('.')) : ''
+}
 
 // --- Datenbank-Hilfen ---
 
