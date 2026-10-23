@@ -115,11 +115,11 @@ export function shiftCodeFor(key: KeyDef): string {
 }
 
 export const FINGER_COLORS = {
-  pinky: '#c7eae4',
-  ring: '#c3ebf3',
-  middle: '#9edce3',
-  index: '#a7e8bd',
-  thumb: '#ffe398',
+  pinky: 'var(--finger-pinky)',
+  ring: 'var(--finger-ring)',
+  middle: 'var(--finger-middle)',
+  index: 'var(--finger-index)',
+  thumb: 'var(--finger-thumb)',
 } as const
 
 export function fingerColor(finger: FingerId | undefined): string | undefined {

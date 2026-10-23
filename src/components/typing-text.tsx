@@ -27,7 +27,7 @@ export function TypingText({ state, lines = 3, className }: Props) {
   return (
     <div
       ref={boxRef}
-      className={cn('relative overflow-hidden font-mono text-2xl leading-[1.8] tracking-wide whitespace-pre-wrap select-none', className)}
+      className={cn('relative overflow-hidden font-mono text-[1.6rem] leading-[1.8] whitespace-pre-wrap select-none', className)}
       style={{ height: `${lines * 1.8}em` }}
     >
       {[...state.text].map((char, i) => {
@@ -40,18 +40,22 @@ export function TypingText({ state, lines = 3, className }: Props) {
             key={i}
             ref={current ? cursorRef : undefined}
             className={cn(
-              'relative rounded-sm',
-              !typed && 'text-muted-foreground',
+              'relative',
+              !typed && 'text-muted-foreground/60',
               typed && !wrong && 'text-foreground',
-              fixed && 'bg-yellow-200/70',
-              wrong && 'bg-red-100 text-red-500',
-              current && 'bg-emerald-100 text-neutral-900',
-              current && state.errors.has(i) && 'bg-red-200',
-              char === ' ' && typed && wrong && 'underline decoration-red-400',
+              fixed && 'underline decoration-amber-500 decoration-2 underline-offset-[6px]',
+              wrong && 'bg-destructive/10 text-destructive',
+              current && 'text-foreground',
+              char === ' ' && typed && wrong && 'underline decoration-destructive decoration-2 underline-offset-[6px]',
             )}
           >
             {current && (
-              <span className="absolute -bottom-0.5 left-0 h-0.5 w-full animate-pulse bg-emerald-500" />
+              <span
+                className={cn(
+                  'absolute top-[0.25em] bottom-[0.2em] -left-px w-[2px] animate-pulse',
+                  state.errors.has(i) ? 'bg-destructive' : 'bg-navy',
+                )}
+              />
             )}
             {char}
           </span>

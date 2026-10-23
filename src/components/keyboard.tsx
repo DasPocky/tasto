@@ -21,9 +21,9 @@ export function Keyboard({ nextChar, pressedCode, enabledChars, className }: Pro
 
   return (
     <div className={cn('mx-auto w-full max-w-3xl select-none', className)}>
-      <div className="flex flex-col gap-1 rounded-xl bg-muted p-2">
+      <div className="flex flex-col gap-1.5">
         {KEYBOARD_DE.map((row, r) => (
-          <div key={r} className="flex gap-1">
+          <div key={r} className="flex gap-1.5">
             {row.map((key) => {
               const isTarget = highlight.has(key.code)
               const disabled = enabledChars && key.base && key.base !== ' ' && !enabledChars.has(key.base)
@@ -33,29 +33,36 @@ export function Keyboard({ nextChar, pressedCode, enabledChars, className }: Pro
                 <div
                   key={key.code}
                   className={cn(
-                    'relative flex h-10 items-center justify-center rounded-md border border-black/10 text-sm text-neutral-700 transition-[transform,box-shadow] duration-75 sm:h-11',
-                    !color && 'bg-white',
-                    disabled && 'text-neutral-300',
-                    isTarget && 'z-10 ring-2 ring-foreground',
-                    pressedCode === key.code && 'translate-y-px shadow-inner',
+                    'relative flex h-10 items-center justify-center overflow-hidden rounded-[5px] border bg-background text-[13px] text-foreground/80 transition-colors duration-75 sm:h-11',
+                    !key.base && !key.finger && 'bg-muted text-muted-foreground',
+                    disabled && 'text-muted-foreground/40',
+                    isTarget && 'border-navy bg-navy text-primary-foreground',
+                    pressedCode === key.code && !isTarget && 'bg-accent',
                   )}
-                  style={{ flex: `${key.width ?? 1} 1 0`, backgroundColor: color }}
+                  style={{ flex: `${key.width ?? 1} 1 0` }}
                 >
-                  {key.label ?? capLabel(key.base)}
-                  {isHome && <span className="absolute bottom-1 h-0.5 w-2 rounded bg-neutral-500" />}
+                  <span className="relative">
+                    {key.label ?? capLabel(key.base)}
+                    {isHome && <span className="absolute -bottom-1 left-1/2 h-px w-2 -translate-x-1/2 bg-current" />}
+                  </span>
+                  {color && (
+                    <span className="absolute inset-x-0 bottom-0 h-[3px]" style={{ backgroundColor: color }} />
+                  )}
                 </div>
               )
             })}
           </div>
         ))}
       </div>
-      {target?.key.finger !== undefined && (
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          {nextChar === ' ' ? 'Leertaste' : <kbd className="font-mono">{nextChar}</kbd>} mit dem{' '}
-          {FINGER_NAMES[target.key.finger]}
-          {target.shift && ' + Umschalttaste'}
-        </p>
-      )}
+      <p className="mt-3 h-5 text-center text-sm text-muted-foreground">
+        {target?.key.finger !== undefined && (
+          <>
+            {nextChar === ' ' ? 'Leertaste' : <kbd className="font-mono text-foreground">{nextChar}</kbd>} mit dem{' '}
+            {FINGER_NAMES[target.key.finger]}
+            {target.shift && ' + Umschalttaste'}
+          </>
+        )}
+      </p>
     </div>
   )
 }

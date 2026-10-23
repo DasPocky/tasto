@@ -3,9 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Keyboard } from '@/components/keyboard'
+import { Page, PageHeader, Stat, StatRow } from '@/components/page'
 import { TypingText } from '@/components/typing-text'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { useTyping } from '@/hooks/use-typing'
 import { api } from '@/lib/api'
 import { formatNumber, formatPercent } from '@/lib/stats'
@@ -88,75 +88,58 @@ export function TippTestPage() {
   const showLocalResult = timeUp && (test?.id === null || saveError !== null)
 
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-10">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Wie schnell tippst du?</h1>
-          <p className="text-muted-foreground">
-            1 Minute, computergenerierte Wörter. Der Test startet mit dem ersten Tastendruck.
-          </p>
-        </div>
-        <div className="flex gap-6 font-mono">
-          <Stat label="Zeit" value={`${remaining}s`} />
-          <Stat label="WPM" value={formatNumber(stats.wpm)} />
-          <Stat label="Genauigkeit" value={formatPercent(stats.accuracy)} />
-        </div>
-      </header>
+    <Page className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Tipp-Test · 60 Sekunden"
+        title="Wie schnell tippst du?"
+        description="Computergenerierte Wörter. Der Test startet mit dem ersten Tastendruck."
+      />
 
       {showLocalResult ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-6 py-6 text-center">
-            <h2 className="text-2xl font-semibold">Dein Ergebnis</h2>
-            {saveError && (
-              <p className="text-sm text-destructive">Ergebnis konnte nicht gespeichert werden: {saveError}</p>
-            )}
-            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-              <Stat big label="WPM" value={formatNumber(stats.wpm, 1)} />
-              <Stat big label="Anschläge/min" value={formatNumber(stats.cpm)} />
-              <Stat big label="Genauigkeit" value={formatPercent(stats.accuracy, 1)} />
-              <Stat big label="Punkte" value={String(stats.score)} />
-            </div>
+        <section className="flex flex-col gap-6">
+          {saveError && (
+            <p className="text-sm text-destructive">Ergebnis konnte nicht gespeichert werden: {saveError}</p>
+          )}
+          <StatRow>
+            <Stat label="Punkte" value={stats.score.toLocaleString('de-DE')} />
+            <Stat label="WPM" value={formatNumber(stats.wpm, 1)} />
+            <Stat label="Anschläge/min" value={formatNumber(stats.cpm)} />
+            <Stat label="Genauigkeit" value={formatPercent(stats.accuracy, 1)} />
+          </StatRow>
+          <div>
             <Button onClick={restart}>
               <RotateCcw /> Neuer Test
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       ) : timeUp ? (
         <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
           <Loader2 className="animate-spin" /> Ergebnis wird ausgewertet …
         </div>
       ) : (
-        <>
-          <Card>
-            <CardContent>
-              {test ? (
-                <TypingText state={state} />
-              ) : (
-                <div className="flex h-[8.1rem] items-center justify-center gap-2 text-muted-foreground">
-                  <Loader2 className="animate-spin" /> Test wird vorbereitet …
-                </div>
+        <section className="flex flex-col gap-8">
+          <StatRow>
+            <Stat size="sm" label="Zeit" value={`${remaining} s`} />
+            <Stat size="sm" label="WPM" value={formatNumber(stats.wpm)} />
+            <Stat size="sm" label="Genauigkeit" value={formatPercent(stats.accuracy)} />
+            <div className="flex items-center justify-end px-4 sm:px-6">
+              {state.startedAt !== null && (
+                <Button variant="ghost" size="sm" onClick={restart}>
+                  <RotateCcw /> Neu starten
+                </Button>
               )}
-            </CardContent>
-          </Card>
-          <Keyboard nextChar={state.text[state.pos]} pressedCode={pressed} />
-          {state.startedAt !== null && (
-            <div className="flex justify-center">
-              <Button variant="ghost" size="sm" onClick={restart}>
-                <RotateCcw /> Neu starten
-              </Button>
+            </div>
+          </StatRow>
+          {test ? (
+            <TypingText state={state} />
+          ) : (
+            <div className="flex h-[8.65rem] items-center justify-center gap-2 text-muted-foreground">
+              <Loader2 className="animate-spin" /> Test wird vorbereitet …
             </div>
           )}
-        </>
+          <Keyboard nextChar={state.text[state.pos]} pressedCode={pressed} />
+        </section>
       )}
-    </main>
-  )
-}
-
-function Stat({ label, value, big }: { label: string; value: string; big?: boolean }) {
-  return (
-    <div className="flex flex-col items-center">
-      <span className={big ? 'text-4xl font-bold' : 'text-xl font-semibold'}>{value}</span>
-      <span className="text-xs tracking-wide text-muted-foreground uppercase">{label}</span>
-    </div>
+    </Page>
   )
 }

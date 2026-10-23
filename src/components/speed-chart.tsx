@@ -6,8 +6,8 @@ interface Props {
   average: number
 }
 
-const WIDTH = 640
-const HEIGHT = 200
+const WIDTH = 1000
+const HEIGHT = 260
 const PAD = { top: 12, right: 12, bottom: 28, left: 40 }
 
 /** Tempoverlauf als einfaches Liniendiagramm (WPM je Abschnitt). */
